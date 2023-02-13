@@ -3,7 +3,6 @@ const User = require("../model/User");
 const Forms = require('../model/Form')
 const ObjectId = require('express').ObjectId;
 const { validationResult } = require("express-validator");
-const user = require("../model/User");
 var jwt = require("jsonwebtoken");
 var expressJwt = require("express-jwt");
 const LocalStorage = require("node-localstorage").LocalStorage;
@@ -16,9 +15,16 @@ router.get("/aa", (req, res) => {
 });
 router.post("/signup", (req, res) => {
   const errors = validationResult(req);
-
+  const { name, email, password,confirm_password } = req.body;
+  const checkUser =  User.findOne({ email });
+  if (checkUser) {
+      return res.status(422).json({ error: "Email already exists" });
+  }
+  if(password != confirm_password){
+    return res.status(422).json({ error: "Password not match with confirm password" });
+  }
   if (!errors.isEmpty()) {
-    return res.status(400).json({
+    return res.status(422).json({
       error: errors.array()[0].msg,
     });
   }
@@ -26,7 +32,7 @@ router.post("/signup", (req, res) => {
   const user = new User(req.body);
   user.save((err, user) => {
     if (err) {
-      return res.status(400).json({
+      return res.status(422).json({
         error: "Unable to add user",
       });
     }
@@ -42,7 +48,7 @@ router.post("/signin", (req, res) => {
   const { email, password } = req.body;
 
   //find user
-  User.findOne({ email }, (err, user) => {
+   User.findOne({ email }, (err, user) => {
     if (err || !user) {
       return res.status(400).json({
         error: "Email was not found",
@@ -69,17 +75,10 @@ router.post("/signin", (req, res) => {
 
     //Store UserId in LocalStorage
     const UserId = _id;
-    localStorage.setItem("userId", UserId);
-    console.log(localStorage.getItem("userId"));
+    localStorage.setItem("UserId", UserId);
+    console.log(localStorage.getItem("UserId"));
 
-    return res.json({
-      token,
-      user: {
-        _id,
-        name,
-        email,
-      },
-    });
+    res.send(user._id)
   });
 });
 
@@ -105,18 +104,5 @@ router.get("/alreadyExist/:id", async (req,res) => {
     return null;
   }
 })
-
-// router.get("/getalluser", (req, res) => {
-//   if (decoded.role === "admin") {
-//     User.find({}, (err, result) => {
-//       if (err) throw err;
-//       res.send(result);
-//     });
-//   } else {
-//     return res.status(403).json({
-//       error: "normal user doesn't have permission to access all data",
-//     });
-//   }
-// });
 
 module.exports = router;

@@ -3,26 +3,13 @@ const express = require("express");
 const ObjectId = express.ObjectId;
 const mongoosePaginate = require("mongoose-paginate-v2");
 
+
 var FormSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   title: String,
-  questions: [
-    {
-      questionText: String,
-      questionType:String,
-      type:Array,
-      required: true,
-      options: [
-        {
-          optionText: String,
-          optionType: { type: String, default: "" },
-        },
-      ],
-    },
-    {
-      label: String,
-    },
-  ],
+  questions:{
+    type:Array
+  } 
 });
 
 FormSchema.plugin(mongoosePaginate);
