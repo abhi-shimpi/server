@@ -5,17 +5,20 @@ const formController = require("./controllers/FormController");
 const responseController = require("./controllers/ResponseController");
 const exportResponseController = require("./controllers/ExportResponseController");
 const cors = require('cors');
-
+const path = require('path')
 const app = express();
 // const router = require("./controllers/UserController");
 // const router1 = require("./controllers/FormController");
 // const router2 = require("./controllers/ResponseController");
 
 // const mongoose=mongoose();
+
+// app.use(express.static(path.join(__dirname + "/public")))
 app.use(express.json());
 
 //To allow outside request 
 app.use(cors());
+
 
 app.get("/", (req, res) => {
   res.send("Home Page");
